@@ -1,0 +1,41 @@
+name: Construir APK Flet
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1️⃣ Chequear código
+      uses: actions/checkout@v4
+
+    - name: 2️⃣ Instalar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: 3️⃣ Instalar Java (Android)
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: "17"
+
+    - name: 4️⃣ Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install flet flet-cli
+        pip install -r requirements.txt
+
+    - name: 5️⃣ Construir APK (auto yes)
+      run: |
+        yes | flet build apk --verbose
+
+    - name: 6️⃣ Subir APK como artefacto
+      uses: actions/upload-artifact@v4
+      with:
+        name: MiAppCredito
+        path: build/apk/*.apk
